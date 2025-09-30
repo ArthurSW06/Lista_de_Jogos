@@ -1,118 +1,254 @@
-// IMPORTA O MÓDULO EXPRESS PARA CONTRUIR A APLICAÇÃO
-const express = require("express");
-// PERMITE QUE ACESSE ROTAS DIFERENTES (DOMÍNIOS)
-const cors = require("cors");
-// MIDDLEWARE QUE ANALISA AS REQUISIÇÕES DO CORPO DA PÁGINA  COMO ENTRADA HTTP
-const bodyParser = require("body-parser");
-// FUNÇÃO RESPONSAVEL POR GERAR ID UNICOS
-const { v4: uuid } = require("uuid");
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
-// INSTANCIANDO O EXPRESS
-const app = express();
+// DECLARANDO A URL DA API QUE SERÁ CONSUMIDA
+const API_URL = "http://localhost:3001/jogos";
 
-// DEFINE A PORTA DO SERVIDOR
-const port = 5173;
+const Jogo = () => {
+  // Estado principal
+  const [jogo, setJogo] = useState([
+    {
+      id: uuidv4(),
+      title: "The Witcher 3",
+      description: "RPG de mundo aberto com foco em narrativa.",
+      year: 2015,
+      company: "CD Projekt Red",
+      image: "/public/images/TheWitcher3.png",
+    },
+    {
+      id: uuidv4(),
+      title: "God of War",
+      description: "Ação e aventura com mitologia nórdica.",
+      year: 2018,
+      company: "Santa Monica Studio",
+      image: "/public/images/GodOfWar.png",
+    },
+    {
+      id: uuidv4(),
+      title: "Red Dead Redemption 2",
+      description: "Jogo de faroeste com mundo aberto e história envolvente.",
+      year: 2018,
+      company: "Rockstar Games",
+      image: "/public/images/RedDead2.png",
+    },
+    {
+      id: uuidv4(),
+      title: "Minecraft",
+      description: "Jogo de construção em blocos e sobrevivência.",
+      year: 2011,
+      company: "Mojang Studios",
+      image: "/public/images/Minecraft.png",
+    },
+    {
+      id: uuidv4(),
+      title: "Hollow Knight",
+      description: "Metroidvania 2D com arte desenhada à mão.",
+      year: 2017,
+      company: "Team Cherry",
+      image: "/public/images/HollowKnight.png",
+    },
+  ]);
 
-// USANDO O CORS PARA HABILITAR AS ROTAS
-app.use(cors());
-//USANDO O BODY-PARSER PARA ANALISAR AS REQUISIÇÕES(EX. DADOS DE UM FORMULARIO) NA APLICAÇÃO E CONVERT PARA JSON
-app.use(bodyParser.json());
+  const [novoJogo, setNovoJogo] = useState({
+    title: "",
+    description: "",
+    year: "",
+    company: "",
+    image: "",
+  });
 
-// VARIAVEL QUE RECEBE UM ARRAY DE JOGOS
-let jogos = [
-  {
-    id: uuid(),
-    title: "The Witcher 3",
-    description: "RPG de mundo aberto com foco em narrativa.",
-    year: 2015,
-    company: "CD Projekt Red",
-    image: "/public/images/TheWitcher3.png",
-  },
-  {
-    id: uuid(),
-    title: "God of War",
-    description: "Ação e aventura com mitologia nórdica.",
-    year: 2018,
-    company: "Santa Monica Studio",
-    image: "/public/images/GodOfWar.png",
-  },
-  {
-    id: uuid(),
-    title: "Red Dead Redemption 2",
-    description: "Jogo de faroeste com mundo aberto e história envolvente.",
-    year: 2018,
-    company: "Rockstar Games",
-    image: "/public/images/RedDead2.png",
-  },
-  {
-    id: uuid(),
-    title: "Minecraft",
-    description: "Jogo de construção em blocos e sobrevivência.",
-    year: 2011,
-    company: "Mojang Studios",
-    image: "/public/images/Minecraft.png",
-  },
-  {
-    id: uuid(),
-    title: "Hollow Knight",
-    description: "Metroidvania 2D com arte desenhada à mão.",
-    year: 2017,
-    company: "Team Cherry",
-    image: "/public/images/HollowKnight.png",
-  }
-]
-// CRIANDO A ROTA CADASTRAR JOGOS (POST)
-app.post("/jogos", (req, res) => {
-  const { title, description, year, company, image } = req.body;
-  if (!title || !description || !year || !company || !image) {
-    return res.status(400).json({ error: "Campos Inválidos" });
-  }
-  // REALIZA O NOVO CADASTRO
-  const novoJogo = { id: uuid(), title, description, year, company, image };
-  jogos.push(novoJogo);
-  // RETORNA O JOGO CRIADO
-  res.status(201).json(novoJogo);
-});
+  const [editar, setEditar] = useState(false);
 
-// ROTA PARA CONSULTAR TODOS OS JOGOS CADASTRADOS (GET)
-app.get("/jogos", (req, res) => {
-  res.json(jogos);
-});
+  // CADASTRAR JOGO (POST)
+  const cadastrarJogo = async () => {
+    if (
+      !novoJogo.title ||
+      !novoJogo.description ||
+      !novoJogo.year ||
+      !novoJogo.company ||
+      !novoJogo.image
+    ) {
+      alert("Todos os campos são obrigatórios");
+      return;
+    }
+    try {
+      const response = await axios.post(`${API_URL}`, novoJogo);
+      setJogo([...jogo, response.data]);
+      setNovoJogo({ title: "", description: "", year: "", company: "", image: "" });
+      setEditar(false);
+    } catch (error) {
+      console.log("Erro ao cadastrar o jogo", error);
+    }
+  };
 
-// ROTA PARA ALTERAR O JOGO CADASTRADO (PUT)
-app.put("/jogos/:id", (req, res) => {
-  const jogosId = req.params.id;
-  const { title, description, year, company, image } = req.body;
+  // CONSULTAR JOGO (GET)
+  const ConsultarJogo = async () => {
+    try {
+      const response = await axios.get(`${API_URL}`);
+      setJogo(response.data);
+    } catch (error) {
+      console.log("Erro ao consultar o jogo", error);
+    }
+  };
 
-  if (!title || !description || !year || !company || !image) {
-    return res.status(400).json({ error: "Campos Inválidos" });
-  }
+  useEffect(() => {
+    ConsultarJogo();
+  }, []);
 
-  const jogosIndex = jogos.findIndex((item) => item.id === jogosId);
-  if (jogosIndex === -1) {
-    return res.status(404).json({ error: "Jogo não encontrado" });
-  }
+  // ALTERAR JOGO (PUT)
+  const alterarJogo = async () => {
+    if (
+      !novoJogo.title ||
+      !novoJogo.description ||
+      !novoJogo.year ||
+      !novoJogo.company ||
+      !novoJogo.image
+    ) {
+      alert("Todos os campos são obrigatórios");
+      return;
+    }
+    try {
+      const response = await axios.put(`${API_URL}/${novoJogo.id}`, novoJogo);
+      setJogo(
+        jogo.map((j) => (j.id === novoJogo.id ? response.data : j))
+      );
+      setNovoJogo({ title: "", description: "", year: "", company: "", image: "" });
+      setEditar(false);
+    } catch (error) {
+      console.log("Erro ao alterar o jogo", error);
+    }
+  };
 
-  jogos[jogosIndex] = { id: jogosId, title, description, year, company, image };
+  // DELETAR JOGO (DELETE)
+  const deletarJogo = async (id) => {
+    if (window.confirm("Tem certeza que deseja deletar este Jogo?")) {
+      try {
+        await axios.delete(`${API_URL}/${id}`);
+        setJogo(jogo.filter((j) => j.id !== id));
+      } catch (error) {
+        console.log("Erro ao deletar Jogo", error);
+      }
+    }
+  };
 
-  res.json(jogos[jogosIndex]);
-});
+  // Método alterar
+  const handleAlterar = (j) => {
+    setNovoJogo(j);
+    setEditar(true);
+  };
 
-// ROTA PARA DELETAR UM JOGO CADASTRADO (DELETE)
-app.delete("/jogos/:id", (req, res) => {
-  const jogosId = req.params.id;
-  const inicioJogos = jogos.length;
+  // Método submit
+  const handleSubmit = () => {
+    if (editar) {
+      alterarJogo();
+    } else {
+      cadastrarJogo();
+    }
+  };
 
-  jogos = jogos.filter((item) => item.id !== jogosId);
+  return (
+  <div className="p-6">
 
-  if (jogos.length === inicioJogos) {
-    return res.status(404).json({ error: "Jogo não encontrado" });
-  }
+    {/* FORMULÁRIO */}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault(); // evita refresh da página
+        handleSubmit();     // chama cadastrarJogo() ou alterarJogo()
+      }}
+      className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6 mb-8 flex flex-col gap-3"
+    >
+      <h2 className="text-xl font-bold mb-4">
+        {editar ? "Editar Jogo" : "Adicionar Jogo"}
+      </h2>
 
-  res.status(200).send("Jogo removido com sucesso");
-});
+      <input
+        type="text"
+        placeholder="Título"
+        value={novoJogo.title}
+        onChange={(e) => setNovoJogo({ ...novoJogo, title: e.target.value })}
+        className="w-full border p-2 rounded"
+      />
 
-// EXECUTANDO O SERVIDOR A NA PORTA DEFINIDA
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta http://localhost:${port}`);
-});
+      <input
+        type="text"
+        placeholder="Descrição"
+        value={novoJogo.description}
+        onChange={(e) => setNovoJogo({ ...novoJogo, description: e.target.value })}
+        className="w-full border p-2 rounded"
+      />
+
+      <input
+        type="number"
+        placeholder="Ano"
+        value={novoJogo.year}
+        onChange={(e) => setNovoJogo({ ...novoJogo, year: e.target.value })}
+        className="w-full border p-2 rounded"
+      />
+
+      <input
+        type="text"
+        placeholder="Empresa"
+        value={novoJogo.company}
+        onChange={(e) => setNovoJogo({ ...novoJogo, company: e.target.value })}
+        className="w-full border p-2 rounded"
+      />
+
+      <input
+        type="text"
+        placeholder="URL da imagem"
+        value={novoJogo.image}
+        onChange={(e) => setNovoJogo({ ...novoJogo, image: e.target.value })}
+        className="w-full border p-2 rounded"
+      />
+
+      <button
+        type="submit"
+        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+      >
+        {editar ? "Salvar Alterações" : "Adicionar Jogo"}
+      </button>
+    </form>
+
+    {/* LISTA DE JOGOS */}
+    <div className="flex flex-wrap gap-6 justify-center">
+      {jogo.map((game) => (
+        <div
+          key={game.id}
+          className="bg-white border border-gray-200 rounded-lg shadow-md p-6 w-80 flex flex-col justify-between"
+        >
+          <img
+            src={game.image}
+            alt={game.title}
+            className="w-full h-56 object-cover rounded-lg mb-4"
+          />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">{game.title}</h2>
+          <p className="text-gray-600 mb-2">{game.description}</p>
+          <div className="text-sm text-gray-500">
+            <p><span className="font-semibold">Ano:</span> {game.year}</p>
+            <p><span className="font-semibold">Empresa:</span> {game.company}</p>
+          </div>
+
+          <div className="flex justify-between mt-4">
+            <button
+              onClick={() => handleAlterar(game)}
+              className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600"
+            >
+              Editar
+            </button>
+            <button
+              onClick={() => deletarJogo(game.id)}
+              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+            >
+              Excluir
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+}
+
+
+export default Jogo;
