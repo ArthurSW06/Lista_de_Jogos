@@ -2,11 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 
-// DECLARANDO A URL DA API QUE SERÁ CONSUMIDA
 const API_URL = "http://localhost:3001/jogos";
 
 const Jogo = () => {
-  // Estado principal
   const [jogo, setJogo] = useState([
     {
       id: uuidv4(),
@@ -14,7 +12,7 @@ const Jogo = () => {
       description: "RPG de mundo aberto com foco em narrativa.",
       year: 2015,
       company: "CD Projekt Red",
-      image: "/public/images/TheWitcher3.png",
+      image: "/images/TheWitcher3.png",
     },
     {
       id: uuidv4(),
@@ -22,7 +20,7 @@ const Jogo = () => {
       description: "Ação e aventura com mitologia nórdica.",
       year: 2018,
       company: "Santa Monica Studio",
-      image: "/public/images/GodOfWar.png",
+      image: "/images/GodOfWar.png",
     },
     {
       id: uuidv4(),
@@ -30,7 +28,7 @@ const Jogo = () => {
       description: "Jogo de faroeste com mundo aberto e história envolvente.",
       year: 2018,
       company: "Rockstar Games",
-      image: "/public/images/RedDead2.png",
+      image: "/images/RedDead2.png",
     },
     {
       id: uuidv4(),
@@ -38,7 +36,7 @@ const Jogo = () => {
       description: "Jogo de construção em blocos e sobrevivência.",
       year: 2011,
       company: "Mojang Studios",
-      image: "/public/images/Minecraft.png",
+      image: "/images/Minecraft.png",
     },
     {
       id: uuidv4(),
@@ -46,7 +44,7 @@ const Jogo = () => {
       description: "Metroidvania 2D com arte desenhada à mão.",
       year: 2017,
       company: "Team Cherry",
-      image: "/public/images/HollowKnight.png",
+      image: "/images/HollowKnight.png",
     },
   ]);
 
@@ -60,14 +58,13 @@ const Jogo = () => {
 
   const [editar, setEditar] = useState(false);
 
-  // CADASTRAR JOGO (POST)
   const cadastrarJogo = async () => {
     if (
-      !novoJogo.title ||
-      !novoJogo.description ||
+      !novoJogo.title.trim() ||
+      !novoJogo.description.trim() ||
       !novoJogo.year ||
-      !novoJogo.company ||
-      !novoJogo.image
+      !novoJogo.company.trim() ||
+      !novoJogo.image.trim()
     ) {
       alert("Todos os campos são obrigatórios");
       return;
@@ -82,7 +79,6 @@ const Jogo = () => {
     }
   };
 
-  // CONSULTAR JOGO (GET)
   const ConsultarJogo = async () => {
     try {
       const response = await axios.get(`${API_URL}`);
@@ -96,23 +92,20 @@ const Jogo = () => {
     ConsultarJogo();
   }, []);
 
-  // ALTERAR JOGO (PUT)
   const alterarJogo = async () => {
     if (
-      !novoJogo.title ||
-      !novoJogo.description ||
+      !novoJogo.title.trim() ||
+      !novoJogo.description.trim() ||
       !novoJogo.year ||
-      !novoJogo.company ||
-      !novoJogo.image
+      !novoJogo.company.trim() ||
+      !novoJogo.image.trim()
     ) {
       alert("Todos os campos são obrigatórios");
       return;
     }
     try {
       const response = await axios.put(`${API_URL}/${novoJogo.id}`, novoJogo);
-      setJogo(
-        jogo.map((j) => (j.id === novoJogo.id ? response.data : j))
-      );
+      setJogo(jogo.map((j) => (j.id === novoJogo.id ? response.data : j)));
       setNovoJogo({ title: "", description: "", year: "", company: "", image: "" });
       setEditar(false);
     } catch (error) {
@@ -120,7 +113,6 @@ const Jogo = () => {
     }
   };
 
-  // DELETAR JOGO (DELETE)
   const deletarJogo = async (id) => {
     if (window.confirm("Tem certeza que deseja deletar este Jogo?")) {
       try {
@@ -132,14 +124,13 @@ const Jogo = () => {
     }
   };
 
-  // Método alterar
   const handleAlterar = (j) => {
     setNovoJogo(j);
     setEditar(true);
   };
 
-  // Método submit
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault(); // evita reload da página
     if (editar) {
       alterarJogo();
     } else {
@@ -148,94 +139,92 @@ const Jogo = () => {
   };
 
   return (
-  <div className="p-6">
-    {/* FORMULÁRIO */}
-    <div className="max-w-md mx-auto bg-white shadow-md rounded-lg p-6 mb-8">
-      <h2 className="text-xl font-bold mb-4">
-        {editar ? "Editar Jogo" : "Adicionar Jogo"}
-      </h2>
-      <input
-        type="text"
-        placeholder="Título"
-        value={novoJogo.title}
-        onChange={(e) => setNovoJogo({ ...novoJogo, title: e.target.value })}
-        className="w-full border p-2 rounded mb-3"
-      />
-      <input
-        type="text"
-        placeholder="Descrição"
-        value={novoJogo.description}
-        onChange={(e) => setNovoJogo({ ...novoJogo, description: e.target.value })}
-        className="w-full border p-2 rounded mb-3"
-      />
-      <input
-        type="number"
-        placeholder="Ano"
-        value={novoJogo.year}
-        onChange={(e) => setNovoJogo({ ...novoJogo, year: e.target.value })}
-        className="w-full border p-2 rounded mb-3"
-      />
-      <input
-        type="text"
-        placeholder="Empresa"
-        value={novoJogo.company}
-        onChange={(e) => setNovoJogo({ ...novoJogo, company: e.target.value })}
-        className="w-full border p-2 rounded mb-3"
-      />
-      <input
-        type="text"
-        placeholder="URL da imagem"
-        value={novoJogo.image}
-        onChange={(e) => setNovoJogo({ ...novoJogo, image: e.target.value })}
-        className="w-full border p-2 rounded mb-3"
-      />
-
-      <button
-        onClick={handleSubmit}
-        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-      >
-        {editar ? "Salvar Alterações" : "Adicionar Jogo"}
-      </button>
-    </div>
-
-    {/* LISTA DE JOGOS */}
-    <div className="flex flex-wrap gap-6 justify-center">
-      {jogo.map((game) => (
-        <div
-          key={game.id}
-          className="bg-white border border-gray-200 rounded-lg shadow-md p-6 w-80 flex flex-col justify-between"
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-6">
+      {/* FORMULÁRIO */}
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-gray-800 border-2 border-blue-600 shadow-2xl rounded-3xl p-6 mb-10">
+        <h2 className="text-2xl font-bold text-blue-400 mb-4 text-center">{editar ? "Editar Jogo" : "Adicionar Jogo"}</h2>
+        <input
+          type="text"
+          placeholder="Título"
+          value={novoJogo.title}
+          onChange={(e) => setNovoJogo({ ...novoJogo, title: e.target.value })}
+          className="w-full border-2 border-blue-600 bg-gray-900 p-2 rounded-lg mb-3 text-white placeholder-gray-400 focus:border-blue-400 outline-none"
+        />
+        <input
+          type="text"
+          placeholder="Descrição"
+          value={novoJogo.description}
+          onChange={(e) => setNovoJogo({ ...novoJogo, description: e.target.value })}
+          className="w-full border-2 border-blue-600 bg-gray-900 p-2 rounded-lg mb-3 text-white placeholder-gray-400 focus:border-blue-400 outline-none"
+        />
+        <input
+          type="number"
+          placeholder="Ano"
+          value={novoJogo.year}
+          onChange={(e) => setNovoJogo({ ...novoJogo, year: e.target.value })}
+          className="w-full border-2 border-blue-600 bg-gray-900 p-2 rounded-lg mb-3 text-white placeholder-gray-400 focus:border-blue-400 outline-none"
+        />
+        <input
+          type="text"
+          placeholder="Empresa"
+          value={novoJogo.company}
+          onChange={(e) => setNovoJogo({ ...novoJogo, company: e.target.value })}
+          className="w-full border-2 border-blue-600 bg-gray-900 p-2 rounded-lg mb-3 text-white placeholder-gray-400 focus:border-blue-400 outline-none"
+        />
+        <input
+          type="text"
+          placeholder="URL da imagem"
+          value={novoJogo.image}
+          onChange={(e) => setNovoJogo({ ...novoJogo, image: e.target.value })}
+          className="w-full border-2 border-blue-600 bg-gray-900 p-2 rounded-lg mb-3 text-white placeholder-gray-400 focus:border-blue-400 outline-none"
+        />
+        <button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold transition transform hover:scale-105"
         >
-          <img
-            src={game.image}
-            alt={game.title}
-            className="w-full h-56 object-cover rounded-lg mb-4"
-          />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{game.title}</h2>
-          <p className="text-gray-600 mb-2">{game.description}</p>
-          <div className="text-sm text-gray-500">
-            <p><span className="font-semibold">Ano:</span> {game.year}</p>
-            <p><span className="font-semibold">Empresa:</span> {game.company}</p>
-          </div>
+          {editar ? "Salvar Alterações" : "Adicionar Jogo"}
+        </button>
+      </form>
 
-          <div className="flex justify-between mt-4">
-            <button
-              onClick={() => handleAlterar(game)}
-              className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600"
-            >
-              Editar
-            </button>
-            <button
-              onClick={() => deletarJogo(game.id)}
-              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-            >
-              Excluir
-            </button>
+      {/* LISTA DE JOGOS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {jogo.map((game) => (
+          <div
+            key={game.id}
+            className="bg-gray-800 border-2 border-blue-600 shadow-2xl rounded-3xl p-3 flex flex-col justify-between transition transform hover:scale-105 hover:shadow-blue-500/50"
+          >
+            <div className="w-full h-64 mb-4 rounded-2xl overflow-hidden border-2 border-blue-500">
+              <img
+                src={game.image}
+                alt={game.title}
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+            <h2 className="text-xl font-bold text-blue-400 mb-1">{game.title}</h2>
+            <p className="text-gray-300 mb-1">{game.description}</p>
+            <div className="text-sm text-gray-400">
+              <p><span className="font-semibold">Ano:</span> {game.year}</p>
+              <p><span className="font-semibold">Empresa:</span> {game.company}</p>
+            </div>
+            <div className="flex justify-between mt-3">
+              <button
+                onClick={() => handleAlterar(game)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg transition transform hover:scale-105"
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => deletarJogo(game.id)}
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition transform hover:scale-105"
+              >
+                Excluir
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Jogo;

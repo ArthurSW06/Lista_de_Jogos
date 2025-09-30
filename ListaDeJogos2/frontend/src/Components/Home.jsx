@@ -19,12 +19,6 @@ function Home() {
         >
           Ver Jogos
         </Link>
-        <Link
-          to="/login"
-          className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-lg font-semibold transition transform hover:scale-105"
-        >
-          Login
-        </Link>
       </div>
 
       {/* Elementos decorativos estilo gamer (fora do fluxo, não afetam scroll) */}
