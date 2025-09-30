@@ -1,80 +1,93 @@
-import { useState } from 'react';
+import { useState } from "react";
+import axios from "axios";
 
-function GameForm({ onAddGame }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [year, setYear] = useState('');
-  const [company, setCompany] = useState('');
-  const [image, setImage] = useState(null); 
+function GameForm({ onAdd }) {
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    year: "",
+    company: "",
+    image: "",
+  });
 
+  // Função para atualizar os campos
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image" && files.length > 0) {
+      // Caso queira usar upload de arquivo real, aqui mudaria para FormData
+      setFormData({ ...formData, image: URL.createObjectURL(files[0]) });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-  
-    const imageUrl = image ? URL.createObjectURL(image) : 'default-image.jpg'; // Caminho padrão se não houver imagem
-
-  // Chama a função do componente pai para adicionar o jogo
-    onAddGame({ title, description, year, company, image: imageUrl });
-    // Limpa os campos do formulário
-    setTitle('');
-    setDescription('');
-    setYear('');
-    setCompany('');
-    setImage(null);
-  };
-
-  // Função para lidar com a mudança da imagem
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-    }
+    axios
+      .post("http://localhost:5173/jogos", formData)
+      .then((res) => {
+        onAdd(res.data); // atualiza a lista de jogos no componente pai
+        setFormData({
+          title: "",
+          description: "",
+          year: "",
+          company: "",
+          image: "",
+        });
+      })
+      .catch((err) => {
+        console.error("Erro ao adicionar jogo:", err);
+      });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-2xl shadow-md mb-6 max-w-2xl mx-auto"
+    >
       <input
         type="text"
+        name="title"
         placeholder="Título do Jogo"
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        value={formData.title}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg mb-4"
       />
       <input
         type="text"
+        name="description"
         placeholder="Descrição"
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        value={formData.description}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg mb-4"
       />
       <input
         type="number"
+        name="year"
         placeholder="Ano de Lançamento"
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={year}
-        onChange={(e) => setYear(e.target.value)}
+        value={formData.year}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg mb-4"
       />
       <input
         type="text"
+        name="company"
         placeholder="Empresa Desenvolvedora"
-        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        value={company}
-        onChange={(e) => setCompany(e.target.value)}
+        value={formData.company}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg mb-4"
       />
-      <div>
-        <p>Selecione uma imagem do jogo:</p>
-        <input
-          type="file"
-          accept="image/"
-          placeholder='Imagem do Jogo'
-          onChange={handleImageChange}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      <input
+        type="file"
+        name="image"
+        accept="image/*"
+        onChange={handleChange}
+        className="w-full p-3 border rounded-lg mb-4"
+      />
       <button
         type="submit"
-        className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg"
       >
         Adicionar Jogo
       </button>
