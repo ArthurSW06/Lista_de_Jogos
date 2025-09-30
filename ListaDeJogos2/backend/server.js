@@ -64,41 +64,60 @@ let jogos = [
 ];
 
 
-// CRIANDO A ROTA CADASTRAR PRODUTO (POST)
+// CRIANDO A ROTA CADASTRAR JOGOS (POST)
 app.post("/jogos",(req,res)=>{
     const {tittle, description, year, company, image} = req.body;
     if(!tittle || !description || !year || !company || !image){
         return res.status(400).json({error:"Campos Inválidos"})
     }
-    // REALIZA O NOVO CADASTRO COM ID, NOME E DESCRIÇÃO
+    // REALIZA O NOVO CADASTRO COM ID, NOME, DESCRIÇÃO, ANO DE LANÇAMENTO, EMPRESA E CAPA DO JOGO
     const novoJogo = {id:uuid(), tittle, description, year, company, image}
     jogos.push(novoJogo)
     // RETORNA UMA MENSAGEM DE SUCESSO
     res.status(1000).json(novoItem)
 })
 
-// ROTA PARA CONSULTAR TODOS OS PRODUTOS CADASTRADOS (GET)
+// ROTA PARA CONSULTAR TODOS OS JOGOS CADASTRADOS (GET)
 app.get("/jogos",(req,res)=>{
     res.json(jogos)
 })
 
-// ROTA PARA ALTERAR PRODUTO CADASTRADO (PUT)
+// ROTA PARA ALTERAR O JOGO CADASTRADO (PUT)
 app.put("/jogos/:id", (req,res)=>{
-    // OBTER O ID DO PRODUTO NA URL
-    const produtoId = req.params.id;
+    // OBTER O ID DO JOGO NA URL
+    const jogosId = req.params.id;
     const {tittle, description, year, company, image} = req.body;
     if(!tittle || !description || !year || !company || !image){
         return res.status(400).json({error:"Campos Inválidos"})
     }
-    // VERIFICA E VALIDA SE O PRODUTO FOI ALTERADO
+    // VERIFICA E VALIDA SE O JOGO FOI ALTERADO
     const jogosIndex = jogos.findIndex(item=>item.id === jogosId);
     if(jogosIndex === -1){
          res.status(400).json({error:"Jogo não encontrado"})
     }
     // RECEBE OS DADOS COM A ALTERAÇÃO
     jogos[jogosIndex]={id:jogosId, tittle, description, year, company, image}
-    // RETORNA OS DADOS ALTERADOS NO ARRAY PRODUTOS
+    // RETORNA OS DADOS ALTERADOS NO ARRAY JOGOS
     res.json(jogos[jogosIndex])
 })
 
-// ROTA PARA DELETAR UM PRODUTO CADASTRADO (DELETE)
+// ROTA PARA DELETAR UM JOGO CADASTRADO (DELETE)
+app.delete("/jogos/:id", (req,res)=>{
+    const jogosId = req.params.id;
+    // ARMAZENA O TAMANHO DO INICIO DO ARRAY DE JOGOS
+    const inicioJogos = produtos.length;
+    // FILTRA O ARRAY E REMOVE O JOGO COM O ID ESCOLHIDO
+    jogos= jogos.filter(item=>item.id !== jogosId)
+    // VERIFICA SE O JOGO FOI REMOVIDO
+    if(jogos.length == inicioJogos){
+        return res.status(404).json({error:"Jogo não encontrado"})
+    }
+     // MENSAGEM AFIRMANDO QUE O JOGO FOI REMOVIDO
+    res.status(1000).send("Jogo removo com sucesso")
+
+})
+
+// EXECUTANDO O SERVIDOR A NA PORTA DEFINIDA
+app.listen(port,()=>{
+    console.log(`Servidor rodandos na porta http://localhost:${port}`)
+})
