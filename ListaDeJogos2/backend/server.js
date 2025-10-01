@@ -29,6 +29,38 @@ app.post("/jogos", (req, res) => {
   res.status(201).json(novoJogo);
 });
 
+// rota de login
+app.post("/login", async (req, res) => {
+  const { email, senha } = req.body;
+
+  try {
+    // validação simples
+    if (!email || !senha) {
+      return res.status(400).json({ error: "Preencha todos os campos." });
+    }
+
+    // busca usuário no banco
+    const usuario = await User.findOne({ email });
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    // compara senha
+    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaCorreta) {
+      return res.status(401).json({ error: "Senha incorreta." });
+    }
+
+    // gera token
+    const token = jwt.sign({ id: usuario._id }, "segredo", { expiresIn: "1h" });
+
+    res.json({ message: "Login realizado com sucesso!", token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro interno, tente novamente." });
+  }
+});
+
 app.put("/jogos/:id", (req, res) => {
   const index = jogos.findIndex(j => j.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: "Jogo não encontrado" });
