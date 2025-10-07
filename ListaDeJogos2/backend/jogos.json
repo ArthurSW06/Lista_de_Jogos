@@ -16,33 +16,25 @@
     "image": "https://image.api.playstation.com/vulcan/img/rnd/202010/2217/LsaRVLF2IU2L1FNtu9d3MKLq.jpg"
   },
   {
-    "id": "3",
-    "title": "Red Dead Redemption 2",
-    "description": "Jogo de faroeste com mundo aberto e história envolvente.",
-    "year": 2018,
-    "company": "Rockstar Games",
-    "image": "/images/RedDead2.png"
-  },
-  {
     "id": "4",
     "title": "Minecraft",
     "description": "Jogo de construção em blocos e sobrevivência.",
     "year": 2011,
     "company": "Mojang Studios",
-    "image": "/images/Minecraft.png"
+    "image": "https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_auto/ncom/es_LA/games/switch/m/minecraft-switch/hero"
   },
   {
-    "id": "",
+    "id": "5",
     "title": "Hollow Knight",
     "description": "Metroidvania 2D com arte desenhada à mão.",
     "year": 2017,
     "company": "Team Cherry",
-    "image": "/images/HollowKnight.png"
+    "image": "https://images.squarespace-cdn.com/content/v1/606d159a953867291018f801/1619987265163-9XILMVT3TK4HZ5X6538M/VH_01_1080pjpg.jpg"
   },
   {
     "id": "06d5be1e-3077-4c3b-95c2-cb94f0072421",
     "title": "Pokemon FireRed",
-    "description": "Ambientado na região de Kanto, onde o jogador captura e treina Pokémons para se tornar um Mestre Pokémon",
+    "description": "Ambientado na região de Kanto, onde o jogador captura e treina Pokémons para se tornar um Mestre Pokémon.",
     "year": "2004",
     "company": "GameFreak",
     "image": "https://tse1.mm.bing.net/th/id/OIP.bKaOc2_Zi0ZcwezfMonApwHaG7?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3"
